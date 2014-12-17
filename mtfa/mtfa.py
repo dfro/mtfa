@@ -81,7 +81,7 @@ class Structure(object):
     L = hb/sqrt(2*self.m_eff*kb*self.T) # Fermi length
     alpha = (1-self.m_eff/m0)**2/self.Eg # nonparabolicity factor
 
-    def cond_dos(E, Ec, z):
+    def cdos(E, Ec, z):
         """returns modified local density of states in conduction
         band"""
         if E >= Ec:
