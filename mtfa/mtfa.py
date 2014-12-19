@@ -80,19 +80,15 @@ class Structure(object):
         self.m_eff = mat.m_eff
      
     def cdos(self, E, Ec, z):
-        """returns modified local density of states in conduction
-        band"""
+        """ Modified density of states in conduction band"""
         C = (2*self.m_eff/(hb**2))**(3./2)/(2*pi**2)
         L = hb/sqrt(2*self.m_eff*kb*self.T) # Fermi length
         # nonparabolicity factor        
         alpha = (1-self.m_eff/m0)**2/self.Eg 
-        if E >= Ec:
-            E = E - Ec
-            # correction factor
-            f = 1 - sinc((2*z/L)*sqrt(E/kb/self.T)*sqrt(1+alpha*E)/pi)
-            return C*sqrt(E)*sqrt(1+alpha*E)*(1+2*alpha*E)*f
-        else:
-            return 0
+        E = E - Ec
+        # correction factor
+        f = 1 - sinc((2*z/L)*sqrt(E/kb/self.T)*sqrt(1+alpha*E)/pi)
+        return C*sqrt(E)*sqrt(1+alpha*E)*(1+2*alpha*E)*f
     
     def fd(self, E, Ef):
         """ Fermi-Dirac function"""
