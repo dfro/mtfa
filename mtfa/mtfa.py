@@ -27,13 +27,15 @@ class Material(object):
     m_e: conduction band effective mass (relative to electron mass)
     m_hh: heavy hole band effective mass 
     m_lh: light hole band effective mass
+    m_eff: effective mass
     eps: dielectric constant
     Ea: ionization energy
     g: degeneracy factor
+    dop_type: type of dopant (donor or acceptor)
     """
-    def __init__(self, material, dopand, database=database):
+    def __init__(self, material, dopant, database=database):
         self.material = material
-        self.dopand = dopand
+        self.dopant = dopant
         self.material_property = database.materialproperty
         matprops = self.material_property[material]
         self.Eg0 =  matprops['Eg0']
@@ -43,9 +45,9 @@ class Material(object):
         self.m_hh = matprops['m_hh']*m0
         self.m_lh = matprops['m_lh']*m0
         self.eps = matprops['eps']
-        self.Ea = matprops['impurity'][dopand]['Ea']
-        self.g = matprops['impurity'][dopand]['g']
-        self.dop_type = matprops['impurity'][dopand]['type']
+        self.Ea = matprops['impurity'][dopant]['Ea']
+        self.g = matprops['impurity'][dopant]['g']
+        self.dop_type = matprops['impurity'][dopant]['type']
         if self.dop_type == 'donor':
             self.m_eff = self.m_e
     
