@@ -17,11 +17,6 @@ m0 = 9.10938E-31    # electron mass (kg)
 m0 = m0/q0          # scale mass to eV
 eps0 = 8.85419E-12  # vacuum permittivity in F/m
 
-
-def bandgap(Eg0, Eg_alpha, Eg_betta, T):
-    """Temperature dependence of energy bandgap"""
-    return Eg0 - Eg_alpha*T**2/(T+ Eg_betta)
-
 class Material(object):
     """Class for material properties.
     
@@ -51,6 +46,10 @@ class Material(object):
         self.Ea = matprops['impurity'][dopand]['Ea']
         self.g = matprops['impurity'][dopand]['g']
         self.dop_type = matprops['impurity'][dopand]['type']
+    
+    def Eg(T):
+        """Temperature dependence of energy bandgap"""
+        return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta) 
         
 class Structure(object):
     """Class for structure properties.
@@ -70,7 +69,7 @@ class Structure(object):
         self.T = T
         self.Nd = Nd
         self.Na = Na
-        self.Eg = bandgap(mat.Eg0, mat.Eg_alpha, mat.Eg_betta, self.T)
+        self.Eg = mat.Eg(self.T)
         self.eps = mat.eps
         self.Ea = mat.Ea
         self.g = mat.g
