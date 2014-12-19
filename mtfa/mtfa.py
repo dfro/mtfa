@@ -46,6 +46,8 @@ class Material(object):
         self.Ea = matprops['impurity'][dopand]['Ea']
         self.g = matprops['impurity'][dopand]['g']
         self.dop_type = matprops['impurity'][dopand]['type']
+        if self.dop_type == 'donor':
+            self.m_eff = self.m_e
     
     def Eg(self, T):
         """Temperature dependence of energy bandgap"""
@@ -73,8 +75,7 @@ class Structure(object):
         self.eps = mat.eps
         self.Ea = mat.Ea
         self.g = mat.g
-        if mat.dop_type == 'donor':
-            self.m_eff = mat.m_e
+        self.m_eff = mat.m_eff
      
     def cdos(self, E, Ec, z):
         """returns modified local density of states in conduction
@@ -95,6 +96,6 @@ class Structure(object):
         """ Fermi-Dirac function"""
         return 1/(1+exp((E-Ef)/kb/self.T))
     
-    def ced(Ec, z, Ef):
+    def ced(self, Ec, z, Ef):
         """depth distribution of  conduction electron density"""
         
