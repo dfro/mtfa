@@ -47,7 +47,7 @@ class Material(object):
         self.g = matprops['impurity'][dopand]['g']
         self.dop_type = matprops['impurity'][dopand]['type']
     
-    def Eg(T):
+    def Eg(self, T):
         """Temperature dependence of energy bandgap"""
         return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta) 
         
