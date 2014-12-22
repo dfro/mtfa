@@ -59,20 +59,27 @@ class Structure(object):
     """Class for structure properties.
     
     attributes:
+    V0: surface potential
     T: temperate
     Nd: donor concentration
     Na: acceptor concentration
+    length: length of structure
+    n: number of points
     Eg: energy band gap
     m_eff: effective mass
     eps: dielectric constant
     Ea: ionization energy
     g: degeneracy factor    
     """
-    def __init__(self, mat, T=300, Nd=0, Na=0):
+    def __init__(self, mat, V0=0, T=300, Nd=0, Na=0, length=5e-8, n=100):
         self.material = mat
+        self.V0 = V0
         self.T = T
         self.Nd = Nd
         self.Na = Na
+        self.length = length
+        self.n = n
+        self.h = length/(n+1)
         self.Eg = mat.Eg(self.T)
         self.eps = mat.eps
         self.Ea = mat.Ea
@@ -94,6 +101,44 @@ class Structure(object):
         """ Fermi-Dirac function"""
         return 1/(1+exp((E-Ef)/kb/self.T))
     
+    def cdos_fd(self, E, Ec, z, Ef):
+        """multiply of two function for integral calculation"""
+        return self.cdos(E, Ec, z)*self.fd(E, Ef)
+    
     def ced(self, Ec, z, Ef):
-        """depth distribution of  conduction electron density"""
+        """depth distribution of conduction electron density"""
+        return quad(self.cdos_fd, Ec, inf, args=(Ec, z, Ef), 
+                    epsrel=0.01)[0]
+    def fermi(self):
+        eff = np.linspace(-0.2, 0.2, 200)
+        for Ef in eff:
+            ro = self.Nd - self.ced(0, 1e-7, Ef)
+            if abs(ro/self.Nd) < 0.1:
+                self.Ef = Ef
+                break
+    
+    def poisson(self, V):
+        d2V = zeros_like(V)
+        n = zeros_like(V)
+
+        d2V[1:-1] = (V[2:]   - 2*V[1:-1] +  V[:-2])
+        d2V[0]    = (V[1]    - 2*V[0]    + self.V0)
+        d2V[-1]   = (        -   V[-1]   +   V[-2])
+
+        for j in range(len(V)):
+            z = j*self.h
+            n[j] = self.ced(V[j], z, self.Ef)
+            
+            
+        return d2V - self.h**2*q0/eps0/self.eps*(self.Nd - n)
+    
+    def initGuess(self):
+        """ initial guess"""
+        self.guess = zeros(self.n, float)
+    
+    def solve(self):
+        """ solve a Poisson equation"""
+        self.sol = newton_krylov(self.poisson, self.guess, 
+                                 method='lgmres', verbose=1)
+        self.guess = self.sol
         
