@@ -3,7 +3,7 @@ from math import pi, sqrt
 from numpy import sinc, exp, inf
 from scipy.integrate import quad, quadrature
 import numpy as np
-from scipy.optimize import newton_krylov
+from scipy.optimize import newton_krylov, newton
 from numpy import zeros_like, mgrid, zeros, exp
 import matplotlib.pyplot as plt
 
@@ -109,18 +109,25 @@ class Structure(object):
         """depth distribution of conduction electron density"""
         return quad(self.cdos_fd, Ec, inf, args=(Ec, z, Ef), 
                     epsrel=0.01)[0]
+    
+    def ionized(self, Ec, Ef):
+        """densities of ionized shallow donors and acceptors"""
+        if self.material.dop_type == 'donor':
+            return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ea)/kb/self.T))
+    
+    def charge(self, Ef):
+        """equation for charge neutrality calculation"""
+        return self.ionized(0, Ef) - self.ced(0, 1e-3, Ef)
+    
     def fermi(self):
-        eff = np.linspace(-0.2, 0.2, 200)
-        for Ef in eff:
-            ro = self.Nd - self.ced(0, 1e-7, Ef)
-            if abs(ro/self.Nd) < 0.1:
-                self.Ef = Ef
-                break
+        """find fermi level using nonlinear solver"""
+        self.Ef = newton(self.charge, 0)
     
     def poisson(self, V):
         d2V = zeros_like(V)
         n = zeros_like(V)
-
+        Nd = zeros_like(V)
+        
         d2V[1:-1] = (V[2:]   - 2*V[1:-1] +  V[:-2])
         d2V[0]    = (V[1]    - 2*V[0]    + self.V0)
         d2V[-1]   = (        -   V[-1]   +   V[-2])
@@ -128,9 +135,10 @@ class Structure(object):
         for j in range(len(V)):
             z = j*self.h
             n[j] = self.ced(V[j], z, self.Ef)
+            Nd[j] = self.ionized(V[j], self.Ef)
             
             
-        return d2V - self.h**2*q0/eps0/self.eps*(self.Nd - n)
+        return d2V - self.h**2*q0/eps0/self.eps*(Nd - n)
     
     def initGuess(self):
         """ initial guess"""
@@ -139,6 +147,7 @@ class Structure(object):
     def solve(self):
         """ solve a Poisson equation"""
         self.sol = newton_krylov(self.poisson, self.guess, 
-                                 method='lgmres', verbose=1)
+                                 method='lgmres', verbose=1,
+                                 f_tol=2e-5, maxiter=20)
         self.guess = self.sol
         
