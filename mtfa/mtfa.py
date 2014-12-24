@@ -6,6 +6,7 @@ import numpy as np
 from scipy.optimize import newton_krylov, newton
 from numpy import zeros_like, mgrid, zeros, exp
 import matplotlib.pyplot as plt
+np.seterr(over='ignore') #ignore overflow error 
 
 import database
 
