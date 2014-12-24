@@ -123,7 +123,7 @@ class Structure(object):
     
     def fermi(self):
         """find fermi level using nonlinear solver"""
-        return newton(self.charge, 0)
+        return newton(self.charge, 0, maxiter=200)
     
     def poisson(self, V):
         d2V = zeros_like(V)
