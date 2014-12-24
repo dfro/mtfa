@@ -10,13 +10,34 @@ materialproperty = {
 'm_hh':0.41, #heavy hole band effective mass 
 'm_lh':0.026, #light hole band effective mass
 'eps':15.15, #dielectric constant
-    'impurity':{ #impurity properties
+'impurity':{ #impurity properties
     'S':{
         'Ea':0.001, # (eV) ionization energies
         'g':2, # degeneracy factor
         'type':'donor'
         },
     },
-
+},
+'Si':{
+'Eg':1.12, 
+'Eg0':1.17,
+'Eg_alpha':4.73e-4, 
+'Eg_betta':636, 
+'m_e':0.023, 
+'m_hh':0.49, 
+'m_lh':0.16,
+'eps':11.7, 
+'impurity':{ 
+    'P':{
+        'Ea':0.045, 
+        'g':2, 
+        'type':'donor'
+        },
+    'B':{
+        'Ea':0.045, 
+        'g':4, 
+        'type':'acceptor'
+        },
+    },
 },
 }
