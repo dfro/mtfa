@@ -10,12 +10,11 @@ materialproperty = {
 'm_hh':0.41, #heavy hole band effective mass 
 'm_lh':0.026, #light hole band effective mass
 'eps':15.15, #dielectric constant
-'M':1, #conduction valleys degeneracy (number of equivalent valleys in the conduction band)
 'impurity':{ #impurity properties
     'S':{
         'Ea':0.001, # (eV) ionization energies
-        'g':2, # degeneracy factor of energy levels
-        'type':'donor' # impurity type
+        'g':2, # degeneracy factor
+        'type':'donor'
         },
     },
 },
@@ -24,14 +23,13 @@ materialproperty = {
 'Eg0':1.17,
 'Eg_alpha':4.73e-4, 
 'Eg_betta':636, 
-'m_e':0.36, 
+'m_e':0.023, 
 'm_hh':0.49, 
 'm_lh':0.16,
-'eps':11.7,
-'M':6, 
+'eps':11.7, 
 'impurity':{ 
     'P':{
-        'Ea':0.1, #0.045
+        'Ea':0.045, 
         'g':2, 
         'type':'donor'
         },

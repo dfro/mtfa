@@ -30,7 +30,6 @@ class Material(object):
     m_lh: light hole band effective mass
     m_eff: effective mass
     eps: dielectric constant
-    M: number of equivalent valleys in the conduction band
     Ea: ionization energy
     g: degeneracy factor
     dop_type: type of dopant (donor or acceptor)
@@ -47,7 +46,6 @@ class Material(object):
         self.m_hh = matprops['m_hh']*m0
         self.m_lh = matprops['m_lh']*m0
         self.eps = matprops['eps']
-        self.M = matprops['M']
         self.Ea = matprops['impurity'][dopant]['Ea']
         self.g = matprops['impurity'][dopant]['g']
         self.dop_type = matprops['impurity'][dopant]['type']
@@ -85,7 +83,6 @@ class Structure(object):
         self.h = length/(n+1)
         self.Eg = mat.Eg(self.T)
         self.eps = mat.eps
-        self.M = mat.M
         self.Ea = mat.Ea
         self.g = mat.g
         self.m_eff = mat.m_eff
@@ -93,7 +90,7 @@ class Structure(object):
      
     def cdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
-        C = M*(2*self.m_eff/(hb**2))**(3./2)/(2*pi**2)
+        C = (2*self.m_eff/(hb**2))**(3./2)/(2*pi**2)
         L = hb/sqrt(2*self.m_eff*kb*self.T) # Fermi length
         # nonparabolicity factor        
         alpha = (1-self.m_eff/m0)**2/self.Eg 
