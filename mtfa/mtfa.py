@@ -85,6 +85,7 @@ class Structure(object):
         self.Ea = mat.Ea
         self.g = mat.g
         self.m_eff = mat.m_eff
+        self.Ef = self.fermi()
      
     def cdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
@@ -121,7 +122,7 @@ class Structure(object):
     
     def fermi(self):
         """find fermi level using nonlinear solver"""
-        self.Ef = newton(self.charge, 0)
+        return newton(self.charge, 0)
     
     def poisson(self, V):
         d2V = zeros_like(V)
