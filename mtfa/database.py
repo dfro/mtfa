@@ -23,13 +23,13 @@ materialproperty = {
 'Eg0':1.17,
 'Eg_alpha':4.73e-4, 
 'Eg_betta':636, 
-'m_e':0.023, 
+'m_e':1.18, #  effective mass of the density of states with for 6 valleys
 'm_hh':0.49, 
 'm_lh':0.16,
 'eps':11.7, 
 'impurity':{ 
     'P':{
-        'Ea':0.045, 
+        'Ea':0.045,
         'g':2, 
         'type':'donor'
         },
