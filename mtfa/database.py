@@ -12,7 +12,7 @@ materialproperty = {
 'eps':15.15, #dielectric constant
 'impurity':{ #impurity properties
     'S':{
-        'Ea':0.001, # (eV) ionization energies
+        'Ei':0.001, # (eV) ionization energies
         'g':2, # degeneracy factor
         'type':'donor'
         },
@@ -29,12 +29,12 @@ materialproperty = {
 'eps':11.7, 
 'impurity':{ 
     'P':{
-        'Ea':0.045,
+        'Ei':0.1, #0.045
         'g':2, 
         'type':'donor'
         },
     'B':{
-        'Ea':0.045, 
+        'Ei':0.045, 
         'g':4, 
         'type':'acceptor'
         },

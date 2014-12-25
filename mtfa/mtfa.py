@@ -30,7 +30,7 @@ class Material(object):
     m_lh: light hole band effective mass
     m_eff: effective mass
     eps: dielectric constant
-    Ea: ionization energy
+    Ei: ionization energy
     g: degeneracy factor
     dop_type: type of dopant (donor or acceptor)
     """
@@ -46,7 +46,7 @@ class Material(object):
         self.m_hh = matprops['m_hh']*m0
         self.m_lh = matprops['m_lh']*m0
         self.eps = matprops['eps']
-        self.Ea = matprops['impurity'][dopant]['Ea']
+        self.Ei = matprops['impurity'][dopant]['Ei']
         self.g = matprops['impurity'][dopant]['g']
         self.dop_type = matprops['impurity'][dopant]['type']
         if self.dop_type == 'donor':
@@ -69,7 +69,7 @@ class Structure(object):
     Eg: energy band gap
     m_eff: effective mass
     eps: dielectric constant
-    Ea: ionization energy
+    Ei: ionization energy
     g: degeneracy factor    
     """
     def __init__(self, mat, V0=0, T=300, Nd=0, Na=0, length=5e-8, n=100):
@@ -83,7 +83,7 @@ class Structure(object):
         self.h = length/(n+1)
         self.Eg = mat.Eg(self.T)
         self.eps = mat.eps
-        self.Ea = mat.Ea
+        self.Ei = mat.Ei
         self.g = mat.g
         self.m_eff = mat.m_eff
         self.Ef = self.fermi()
@@ -115,7 +115,7 @@ class Structure(object):
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
         if self.material.dop_type == 'donor':
-            return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ea)/kb/self.T))
+            return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ei)/kb/self.T))
     
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
