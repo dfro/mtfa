@@ -18,6 +18,24 @@ m0 = 9.10938E-31    # electron mass (kg)
 m0 = m0/q0          # scale mass to eV
 eps0 = 8.85419E-12  # vacuum permittivity in F/m
 
+
+def diff2(f, a, x, left, right=0):
+    """discrete form of second order derivative d(a*df) 
+    with non uniform mesh
+    """
+    h = x[1:] - x[:-1]
+    f = np.insert(f, 0, left)
+    f = np.append(f, right)
+
+    
+    d2f = (a[:-2]+a[1:-1])/(h[:-1]*(h[:-1]+h[1:]))*f[:-2] -\
+          f[1:-1]/(h[:-1]+h[1:])*\
+          ((a[:-2]+a[1:-1])/h[:-1]+(a[2:]+a[1:-1])/h[1:])+\
+          (a[2:]+a[1:-1])/(h[1:]*(h[:-1]+h[1:]))*f[2:]
+    
+    return d2f
+
+
 class Material(object):
     """Class for material properties.
     
