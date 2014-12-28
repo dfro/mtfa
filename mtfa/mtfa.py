@@ -155,10 +155,9 @@ class Structure(object):
         Nd  = zeros_like(V)
         d2V = diff2(V, self.eps, self.z, self.V0)
 
-        for j in range(len(V)):
-            z = j*self.h
-            n[j] = self.ced(V[j], z, self.Ef)
-            Nd[j] = self.ionized(V[j], self.Ef)
+        for i, z in enumerate(self.z[1:-1]):
+            n[i] = self.ced(V[i], z, self.Ef)
+            Nd[i] = self.ionized(V[i], self.Ef)
             
             
         return d2V - q0*(Nd - n)
