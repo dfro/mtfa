@@ -4,7 +4,7 @@ from numpy import sinc, exp, inf
 from scipy.integrate import quad, quadrature
 import numpy as np
 from scipy.optimize import newton_krylov, newton
-from numpy import zeros_like, mgrid, zeros, exp
+from numpy import zeros_like,ones_like, zeros, exp
 import matplotlib.pyplot as plt
 np.seterr(over='ignore') #ignore overflow error 
 
@@ -99,13 +99,20 @@ class Structure(object):
         self.length = length
         self.n = n
         self.h = length/(n+1)
+        self.z = self.gen_mesh()
         self.Eg = mat.Eg(self.T)
-        self.eps = mat.eps
+        self.eps = self.gen_array(mat.eps)*eps0
         self.Ei = mat.Ei
         self.g = mat.g
         self.m_eff = mat.m_eff
         self.Ef = self.fermi()
-     
+    
+    def gen_mesh(self):
+        return np.linspace(0, self.length, self.n)
+    
+    def gen_array(self, param):
+        return param*ones_like(self.z)
+    
     def cdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
         C = (2*self.m_eff/(hb**2))**(3./2)/(2*pi**2)
@@ -144,13 +151,9 @@ class Structure(object):
         return newton(self.charge, 0, maxiter=200)
     
     def poisson(self, V):
-        d2V = zeros_like(V)
         n = zeros_like(V)
-        Nd = zeros_like(V)
-        
-        d2V[1:-1] = (V[2:]   - 2*V[1:-1] +  V[:-2])
-        d2V[0]    = (V[1]    - 2*V[0]    + self.V0)
-        d2V[-1]   = (        -   V[-1]   +   V[-2])
+        Nd  = zeros_like(V)
+        d2V = diff2(V, self.eps, self.z, self.V0)
 
         for j in range(len(V)):
             z = j*self.h
@@ -158,16 +161,20 @@ class Structure(object):
             Nd[j] = self.ionized(V[j], self.Ef)
             
             
-        return d2V - self.h**2*q0/eps0/self.eps*(Nd - n)
+        return d2V - q0*(Nd - n)
     
     def initGuess(self):
         """ initial guess"""
-        self.guess = zeros(self.n, float)
+        self.guess = zeros(self.n-2, float)
     
     def solve(self):
         """ solve a Poisson equation"""
         self.sol = newton_krylov(self.poisson, self.guess, 
                                  method='lgmres', verbose=1,
                                  f_tol=2e-5, maxiter=20)
+        #add boundaries
+        self.sol = np.insert(self.sol, 0, self.V0)
+        self.sol = np.append(self.sol, 0)
+        # set initial guess for next iteration in C-V
         self.guess = self.sol
         
