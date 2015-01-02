@@ -153,14 +153,14 @@ class Structure(object):
     def poisson(self, V):
         n = zeros_like(V)
         Nd  = zeros_like(V)
-        d2V = diff2(V, self.eps, self.z, self.V0)
+        d2V = diff2(V, self.eps, self.z, self.V0)*self.h
 
         for i, z in enumerate(self.z[1:-1]):
             n[i] = self.ced(V[i], z, self.Ef)
             Nd[i] = self.ionized(V[i], self.Ef)
             
             
-        return d2V - q0*(Nd - n)
+        return d2V - q0*(Nd - n)*self.h
     
     def initGuess(self):
         """ initial guess"""
@@ -171,9 +171,9 @@ class Structure(object):
         self.sol = newton_krylov(self.poisson, self.guess, 
                                  method='lgmres', verbose=1,
                                  f_tol=2e-5, maxiter=20)
+        self.guess = self.sol
         #add boundaries
         self.sol = np.insert(self.sol, 0, self.V0)
         self.sol = np.append(self.sol, 0)
         # set initial guess for next iteration in C-V
-        self.guess = self.sol
         
