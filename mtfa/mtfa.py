@@ -83,8 +83,8 @@ class Structure(object):
     attributes:
     V0: surface potential
     T: temperate
-    Nd: donor concentration
-    Na: acceptor concentration
+    Nd: donor concentration in cm-3
+    Na: acceptor concentration in cm-3
     length: length of structure
     n: number of points
     Eg: energy band gap
@@ -97,8 +97,8 @@ class Structure(object):
         self.material = mat
         self.V0 = V0
         self.T = T
-        self.Nd = Nd
-        self.Na = Na
+        self.Nd = Nd*1e6
+        self.Na = Na*1e6
         self.length = length
         self.n = n
         self.h = length/(n+1)
