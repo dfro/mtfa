@@ -72,7 +72,7 @@ class Material(object):
     
     def Eg(self, T):
         """Temperature dependence of energy bandgap"""
-        if self.Eg0 = None:
+        if self.Eg0 == None:
             return self.Eg
         else:
             return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta) 
