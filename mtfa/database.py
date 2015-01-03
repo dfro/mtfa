@@ -18,6 +18,25 @@ materialproperty = {
         },
     },
 },
+
+'InN':{
+'Eg':0.503, #0.642
+'Eg0':None, #
+'Eg_alpha':2.5e-4, 
+'Eg_betta':624, 
+'m_e':0.045, #0.11 
+'m_hh':1.63, 
+'m_lh':0.27,
+'eps':15.3, 
+'impurity':{ 
+    'X':{
+        'Ei':0.01,
+        'g':2, 
+        'type':'donor'
+        },
+    },
+},
+
 'Si':{
 'Eg':1.12, 
 'Eg0':1.17,
@@ -40,4 +59,23 @@ materialproperty = {
         },
     },
 },
+
+'SnO2':{
+'Eg':3.6, 
+'Eg0':None,
+'Eg_alpha':None, 
+'Eg_betta':None, 
+'m_e':0.27,
+'m_hh':0, 
+'m_lh':0,
+'eps':12.2, 
+'impurity':{ 
+    'Sb':{
+        'Ei':10e-3, 
+        'g':2, 
+        'type':'donor'
+        },
+    },
+},
+
 }
