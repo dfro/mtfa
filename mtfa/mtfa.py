@@ -115,38 +115,56 @@ class Structure(object):
             self.Ei = mat.Ei
             self.g = mat.g
         self.m_eff = mat.m_eff
+        # nonparabolicity factor        
+#        self.alpha = (1-self.m_eff/m0)**2/self.Eg
+        self.alpha = 1/self.Eg
+        self.epsrel = 0.01
         self.Ef = self.fermi()
-    
+                
     def gen_mesh(self):
         return np.linspace(0, self.length, self.n)
     
     def gen_array(self, param):
         return param*ones_like(self.z)
     
-    def cdos(self, E, Ec, z):
-        """ Modified density of states in conduction band"""
-        C = (2*self.m_eff/(hb**2))**(3./2)/(2*pi**2)
-        L = hb/sqrt(2*self.m_eff*kb*self.T) # Fermi length
-        # nonparabolicity factor        
-        alpha = (1-self.m_eff/m0)**2/self.Eg 
+    def cdos(self, E, Ec):
+        """ density of states in conduction band"""
+        C = (2*self.m_eff/hb**2)**(3./2)/(2*pi**2)
         E = E - Ec
+        return C*sqrt(E)*sqrt(1+self.alpha*E)*(1+2*self.alpha*E)
+        
+    def mcdos(self, E, Ec, z):
+        """ Modified density of states in conduction band"""
+        if self.Ef < 0:
+            L = hb/sqrt(2*self.m_eff*kb*self.T)
+        else:
+            L = hb/sqrt(2*self.m_eff*self.Ef) # Fermi length
         # correction factor
-        f = 1 - sinc((2*z/L)*sqrt(E/kb/self.T)*sqrt(1+alpha*E)/pi)
-        return C*sqrt(E)*sqrt(1+alpha*E)*(1+2*alpha*E)*f
+        f = 1 - sinc((2*z/L)*sqrt((E-Ec)/kb/self.T)*sqrt(1+self.alpha*(E-Ec))/pi)
+        return self.cdos(E, Ec)*f
     
     def fd(self, E, Ef):
         """ Fermi-Dirac function"""
         return 1/(1+exp((E-Ef)/kb/self.T))
     
-    def cdos_fd(self, E, Ec, z, Ef):
+    def cdos_fd(self, E, Ec, Ef):
         """multiply of two function for integral calculation"""
-        return self.cdos(E, Ec, z)*self.fd(E, Ef)
-    
-    def ced(self, Ec, z, Ef):
-        """depth distribution of conduction electron density"""
-        return quad(self.cdos_fd, Ec, inf, args=(Ec, z, Ef), 
-                    epsrel=0.01)[0]
-    
+        return self.cdos(E, Ec)*self.fd(E, Ef)
+
+    def mcdos_fd(self, E, Ec, z, Ef):
+        """multiply of two function for integral calculation"""
+        return self.mcdos(E, Ec, z)*self.fd(E, Ef)
+        
+    def ced(self, Ec, Ef):
+        """conduction electron density"""
+        return quad(self.cdos_fd, Ec, inf, args=(Ec, Ef), 
+                    epsrel=self.epsrel)[0]
+
+    def mced(self, Ec, z, Ef):
+        """depth distribution of modified conduction electron density"""
+        return quad(self.mcdos_fd, Ec, inf, args=(Ec, z, Ef), 
+                    epsrel=self.epsrel)[0] 
+                    
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
         if not self.all_ionized:
@@ -156,7 +174,7 @@ class Structure(object):
             
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
-        return self.ionized(0, Ef) - self.ced(0, 1e-3, Ef)
+        return self.ionized(0, Ef) - self.ced(0, Ef)
     
     def fermi(self):
         """find fermi level using nonlinear solver"""
@@ -168,7 +186,7 @@ class Structure(object):
         d2V = diff2(V, self.eps, self.z, self.V0)*self.h
 
         for i, z in enumerate(self.z[1:-1]):
-            n[i] = self.ced(V[i], z, self.Ef)
+            n[i] = self.mced(V[i], z, self.Ef)
             Nd[i] = self.ionized(V[i], self.Ef)
             
             
