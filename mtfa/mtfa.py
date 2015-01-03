@@ -52,7 +52,7 @@ class Material(object):
     g: degeneracy factor
     dop_type: type of dopant (donor or acceptor)
     """
-    def __init__(self, material, dopant, database=database):
+    def __init__(self, material, dopant=None, database=database):
         self.material = material
         self.dopant = dopant
         self.material_property = database.materialproperty
@@ -65,11 +65,15 @@ class Material(object):
         self.m_hh = matprops['m_hh']*m0
         self.m_lh = matprops['m_lh']*m0
         self.eps = matprops['eps']
-        self.Ei = matprops['impurity'][dopant]['Ei']
-        self.g = matprops['impurity'][dopant]['g']
-        self.dop_type = matprops['impurity'][dopant]['type']
-        if self.dop_type == 'donor':
-            self.m_eff = self.m_e
+        if dopant == None:
+            self.all_ionized = True
+        else:
+            self.all_ionized = False
+            self.Ei = matprops['impurity'][dopant]['Ei']
+            self.g = matprops['impurity'][dopant]['g']
+            self.dop_type = matprops['impurity'][dopant]['type']
+        
+        self.m_eff = self.m_e
     
     def Eg(self, T):
         """Temperature dependence of energy bandgap"""
@@ -106,8 +110,10 @@ class Structure(object):
         self.z = self.gen_mesh()
         self.Eg = mat.Eg(self.T)
         self.eps = self.gen_array(mat.eps)*eps0
-        self.Ei = mat.Ei
-        self.g = mat.g
+        self.all_ionized = mat.all_ionized
+        if not self.all_ionized:
+            self.Ei = mat.Ei
+            self.g = mat.g
         self.m_eff = mat.m_eff
         self.Ef = self.fermi()
     
@@ -143,8 +149,10 @@ class Structure(object):
     
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
-        if self.material.dop_type == 'donor':
+        if not self.all_ionized:
             return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ei)/kb/self.T))
+        else:
+            return self.Nd
             
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
