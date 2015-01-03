@@ -57,6 +57,7 @@ class Material(object):
         self.dopant = dopant
         self.material_property = database.materialproperty
         matprops = self.material_property[material]
+        self.Eg_300 = matprops['Eg']
         self.Eg0 =  matprops['Eg0']
         self.Eg_alpha =  matprops['Eg_alpha']
         self.Eg_betta =  matprops['Eg_betta']
@@ -73,7 +74,7 @@ class Material(object):
     def Eg(self, T):
         """Temperature dependence of energy bandgap"""
         if self.Eg0 == None:
-            return self.Eg
+            return self.Eg_300
         else:
             return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta) 
         
@@ -144,7 +145,7 @@ class Structure(object):
         """densities of ionized shallow donors and acceptors"""
         if self.material.dop_type == 'donor':
             return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ei)/kb/self.T))
-    
+            
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
         return self.ionized(0, Ef) - self.ced(0, 1e-3, Ef)
