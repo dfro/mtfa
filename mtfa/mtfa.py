@@ -96,7 +96,9 @@ class Structure(object):
     m_eff: effective mass
     eps: dielectric constant
     Ei: ionization energy
-    g: degeneracy factor    
+    g: degeneracy factor 
+    F: electric field in V/m
+    nss: surface sheet charge in cm-2
     """
     def __init__(self, mat, V0=0, T=300, Nd=0, Na=0, length=5e-8, n=100):
         self.material = mat
@@ -201,9 +203,11 @@ class Structure(object):
         self.sol = newton_krylov(self.poisson, self.guess, 
                                  method='lgmres', verbose=1,
                                  f_tol=2e-5, maxiter=20)
+        # set initial guess for next iteration in C-V
         self.guess = self.sol
         #add boundaries
         self.sol = np.insert(self.sol, 0, self.V0)
         self.sol = np.append(self.sol, 0)
-        # set initial guess for next iteration in C-V
+        self.F = (self.sol[0]-self.sol[1])/(self.z[0]-self.z[1])
+        self.nss = self.F*self.eps[0]/q0/1e4
         
