@@ -35,9 +35,6 @@ class Material(object):
         self.Eg0 =  matprops['Eg0']
         self.Eg_alpha =  matprops['Eg_alpha']
         self.Eg_betta =  matprops['Eg_betta']
-        self.m_e = matprops['m_e']*m0
-        self.m_hh = matprops['m_hh']*m0
-        self.m_lh = matprops['m_lh']*m0
         self.eps = matprops['eps']
         if dopant == None:
             self.all_ionized = True
@@ -47,7 +44,16 @@ class Material(object):
             self.g = matprops['impurity'][dopant]['g']
             self.dop_type = matprops['impurity'][dopant]['type']
         
-        self.m_eff = self.m_e
+        try:
+            Mc = matprops['Mc']
+        except:
+            Mc = 1
+        
+        m_e = matprops['m_e']*m0
+        m_hh = matprops['m_hh']*m0
+        m_lh = matprops['m_lh']*m0          
+        self.m_n = Mc**(2./3)*m_e
+        self.m_p = (m_hh**1.5+m_lh**1.5)**(2./3)
     
     def Eg(self, T):
         """Temperature dependence of energy bandgap"""
@@ -63,6 +69,7 @@ materialproperty = {
 'Eg_alpha':2.76e-4, # (eV/K) parameter  for Eg temperature dependence
 'Eg_betta':83, # (K) parameter  for Eg temperature dependence
 'm_e':0.023, #conduction band effective mass (relative to electron mass)
+'Mc':1, #number of equivalent valleys in conduction band
 'm_hh':0.41, #heavy hole band effective mass 
 'm_lh':0.026, #light hole band effective mass
 'eps':15.15, #dielectric constant
@@ -84,13 +91,6 @@ materialproperty = {
 'm_hh':1.63, 
 'm_lh':0.27,
 'eps':15.3, 
-'impurity':{ 
-    'X':{
-        'Ei':0.01,
-        'g':2, 
-        'type':'donor'
-        },
-    },
 },
 
 'Si':{
@@ -98,7 +98,8 @@ materialproperty = {
 'Eg0':1.17,
 'Eg_alpha':4.73e-4, 
 'Eg_betta':636, 
-'m_e':1.18, #  effective mass of the density of states for 6 valleys
+'m_e':0.32,
+'Mc':6,
 'm_hh':0.49, 
 'm_lh':0.16,
 'eps':11.7, 
@@ -125,13 +126,6 @@ materialproperty = {
 'm_hh':0, 
 'm_lh':0,
 'eps':12.2, 
-'impurity':{ 
-    'Sb':{
-        'Ei':10e-3, 
-        'g':2, 
-        'type':'donor'
-        },
-    },
 },
 
 }

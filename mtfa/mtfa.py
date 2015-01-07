@@ -41,7 +41,7 @@ class Structure(object):
     length: length of structure
     n: number of points
     Eg: energy band gap
-    m_eff: effective mass
+    m_n: effective electron mass
     eps: dielectric constant
     Ei: ionization energy
     g: degeneracy factor 
@@ -64,9 +64,10 @@ class Structure(object):
         if not self.all_ionized:
             self.Ei = mat.Ei
             self.g = mat.g
-        self.m_eff = mat.m_eff
+        self.m_n = mat.m_n
+        self.m_p = mat.m_p
         # nonparabolicity factor        
-#        self.alpha = (1-self.m_eff/m0)**2/self.Eg
+#        self.alpha = (1-self.m_n/m0)**2/self.Eg
         self.alpha = 1/self.Eg
         self.epsrel = 0.01
         self.Ef = self.fermi()
@@ -79,16 +80,16 @@ class Structure(object):
     
     def cdos(self, E, Ec):
         """ density of states in conduction band"""
-        C = (2*self.m_eff/hb**2)**(3./2)/(2*pi**2)
+        C = (2*self.m_n/hb**2)**(3./2)/(2*pi**2)
         E = E - Ec
         return C*sqrt(E)*sqrt(1+self.alpha*E)*(1+2*self.alpha*E)
         
     def mcdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
         if self.Ef < 0:
-            L = hb/sqrt(2*self.m_eff*kb*self.T)
+            L = hb/sqrt(2*self.m_n*kb*self.T)
         else:
-            L = hb/sqrt(2*self.m_eff*self.Ef) # Fermi length
+            L = hb/sqrt(2*self.m_n*self.Ef) # Fermi length
         # correction factor
         f = 1 - sinc((2*z/L)*sqrt((E-Ec)/kb/self.T)*sqrt(1+self.alpha*(E-Ec))/pi)
         return self.cdos(E, Ec)*f
