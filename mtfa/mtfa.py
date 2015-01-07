@@ -83,7 +83,7 @@ class Structure(object):
         C = (2*self.m_n/hb**2)**(3./2)/(2*pi**2)
         E = E - Ec
         return C*sqrt(E)*sqrt(1+self.alpha*E)*(1+2*self.alpha*E)
-        
+            
     def mcdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
         if self.Ef < 0:
@@ -105,6 +105,11 @@ class Structure(object):
     def mcdos_fd(self, E, Ec, z, Ef):
         """multiply of two function for integral calculation"""
         return self.mcdos(E, Ec, z)*self.fd(E, Ef)
+
+    def vdos_fd(self, E, Ev):
+        """ density of states in valence band multiplied by fd"""
+        C = (2*self.m_p/hb**2)**(3./2)/(2*pi**2)
+        return C*sqrt(Ev - E)*(1 - self.fd(E, Ef))
         
     def ced(self, Ec, Ef):
         """conduction electron density"""
@@ -115,7 +120,12 @@ class Structure(object):
         """depth distribution of modified conduction electron density"""
         return quad(self.mcdos_fd, Ec, inf, args=(Ec, z, Ef), 
                     epsrel=self.epsrel)[0] 
-                    
+    
+    def vced(self, Ev, Ef):
+        """holes in valence band"""
+        return quad(self.vdos_fd, Ev, -inf, args=(Ec, Ef), 
+                    epsrel=self.epsrel)[0]
+    
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
         if not self.all_ionized:
