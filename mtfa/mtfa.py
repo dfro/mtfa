@@ -8,16 +8,7 @@ from numpy import zeros_like,ones_like, zeros, exp
 import matplotlib.pyplot as plt
 np.seterr(over='ignore') #ignore overflow error 
 
-import database
-
-#Defining constants
-kb = 8.61735E-5     # Boltzmann constant in eV/K
-hb = 6.58212E-16    # Plank's constant(h) in eV*s
-q0 = 1.60218E-19    # electron charge (C)
-m0 = 9.10938E-31    # electron mass (kg)
-m0 = m0/q0          # scale mass to eV
-eps0 = 8.85419E-12  # vacuum permittivity in F/m
-
+from database import Material, materialproperty, kb, hb, q0, m0, eps0
 
 def diff2(f, a, x, left, right=0):
     """discrete form of second order derivative d(a*df) 
@@ -36,51 +27,8 @@ def diff2(f, a, x, left, right=0):
     return d2f
 
 
-class Material(object):
-    """Class for material properties.
-    
-    attributes: 
-    Eg0: energy band gap at 0K
-    Eg_alpha: parameter  for Eg temperature dependence
-    Eg_betta: parameter  for Eg temperature dependence
-    m_e: conduction band effective mass (relative to electron mass)
-    m_hh: heavy hole band effective mass 
-    m_lh: light hole band effective mass
-    m_eff: effective mass
-    eps: dielectric constant
-    Ei: ionization energy
-    g: degeneracy factor
-    dop_type: type of dopant (donor or acceptor)
-    """
-    def __init__(self, material, dopant=None, database=database):
-        self.material = material
-        self.dopant = dopant
-        self.material_property = database.materialproperty
-        matprops = self.material_property[material]
-        self.Eg_300 = matprops['Eg']
-        self.Eg0 =  matprops['Eg0']
-        self.Eg_alpha =  matprops['Eg_alpha']
-        self.Eg_betta =  matprops['Eg_betta']
-        self.m_e = matprops['m_e']*m0
-        self.m_hh = matprops['m_hh']*m0
-        self.m_lh = matprops['m_lh']*m0
-        self.eps = matprops['eps']
-        if dopant == None:
-            self.all_ionized = True
-        else:
-            self.all_ionized = False
-            self.Ei = matprops['impurity'][dopant]['Ei']
-            self.g = matprops['impurity'][dopant]['g']
-            self.dop_type = matprops['impurity'][dopant]['type']
-        
-        self.m_eff = self.m_e
-    
-    def Eg(self, T):
-        """Temperature dependence of energy bandgap"""
-        if self.Eg0 == None:
-            return self.Eg_300
-        else:
-            return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta) 
+class Material(Material):
+    pass
         
 class Structure(object):
     """Class for structure properties.
