@@ -47,6 +47,7 @@ class Structure(object):
     g: degeneracy factor 
     F: electric field in V/m
     nss: surface sheet charge in cm-2
+    Q: surface charge in cm-2
     """
     def __init__(self, mat, V0=0, T=300, Nd=0, Na=0, length=5e-8, n=100):
         self.material = mat
@@ -106,7 +107,7 @@ class Structure(object):
         """multiply of two function for integral calculation"""
         return self.mcdos(E, Ec, z)*self.fd(E, Ef)
 
-    def vdos_fd(self, E, Ev):
+    def vdos_fd(self, E, Ev, Ef):
         """ density of states in valence band multiplied by fd"""
         C = (2*self.m_p/hb**2)**(3./2)/(2*pi**2)
         return C*sqrt(Ev - E)*(1 - self.fd(E, Ef))
@@ -121,10 +122,10 @@ class Structure(object):
         return quad(self.mcdos_fd, Ec, inf, args=(Ec, z, Ef), 
                     epsrel=self.epsrel)[0] 
     
-    def vced(self, Ev, Ef):
+    def vhd(self, Ev, Ef):
         """holes in valence band"""
-        return quad(self.vdos_fd, Ev, -inf, args=(Ec, Ef), 
-                    epsrel=self.epsrel)[0]
+        return quad(self.vdos_fd, -inf, Ev, args=(Ev, Ef), 
+                    epsrel=self.epsrel, limit=200)[0]
     
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
@@ -135,7 +136,7 @@ class Structure(object):
             
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
-        return self.ionized(0, Ef) - self.ced(0, Ef)
+        return self.ionized(0, Ef)-self.ced(0, Ef)+self.vhd(-self.Eg, Ef)
     
     def fermi(self):
         """find fermi level using nonlinear solver"""
@@ -143,19 +144,21 @@ class Structure(object):
     
     def poisson(self, V):
         n = zeros_like(V)
+        p = zeros_like(V)
         Nd  = zeros_like(V)
         d2V = diff2(V, self.eps, self.z, self.V0)*self.h
 
         for i, z in enumerate(self.z[1:-1]):
             n[i] = self.mced(V[i], z, self.Ef)
+            p[i] = self.vhd(V[i]-self.Eg, self.Ef)
             Nd[i] = self.ionized(V[i], self.Ef)
             
             
-        return d2V - q0*(Nd - n)*self.h
+        return d2V - q0*(Nd - n + p)*self.h
     
     def initGuess(self):
         """ initial guess"""
-        self.guess = zeros(self.n-2, float)
+        self.guess = zeros(len(self.z)-2)
     
     def solve(self):
         """ solve a Poisson equation"""
@@ -169,4 +172,5 @@ class Structure(object):
         self.sol = np.append(self.sol, 0)
         self.F = (self.sol[0]-self.sol[1])/(self.z[0]-self.z[1])
         self.nss = self.F*self.eps[0]/q0/1e4
+        self.Q = self.F*self.eps[0]/1e-2
         
