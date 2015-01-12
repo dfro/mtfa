@@ -61,7 +61,6 @@ class Structure(object):
         self.h = length/(n+1)
         self.z = self.gen_mesh()
         self.Eg = mat.Eg(self.T)
-        self.eps = self.gen_array(mat.eps)*eps0
         self.all_ionized = mat.all_ionized
         if not self.all_ionized:
             self.Ei = mat.Ei
@@ -73,8 +72,17 @@ class Structure(object):
         self.alpha = 1/self.Eg
         self.epsrel = 0.01
         self.Ef = self.fermi()
-        self.M = self.preconditioner(self.z)
-                
+    
+    def __setattr__(self, name, value):
+        """ overwrite attribute assignment"""
+        object.__setattr__(self,name, value)
+        if name is 'z':
+            new_eps = self.gen_array(self.material.eps)*eps0
+            object.__setattr__(self, 'n', len(self.z))
+            object.__setattr__(self, 'length', max(self.z))
+            object.__setattr__(self, 'M', self.preconditioner(self.z))
+            object.__setattr__(self, 'eps', new_eps)  
+    
     def gen_mesh(self):
         return np.linspace(0, self.length, self.n)
     
