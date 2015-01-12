@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from math import pi, sqrt
-from numpy import sinc, exp, inf
-from scipy.integrate import quad, quadrature
+from numpy import sinc, exp, inf, zeros_like, zeros, ones_like
 import numpy as np
+from scipy.integrate import quad, quadrature
 from scipy.optimize import newton_krylov, newton
-from numpy import zeros_like,ones_like, zeros, exp
+from scipy.sparse import spdiags
+from scipy.sparse.linalg import spilu, LinearOperator
 import matplotlib.pyplot as plt
 np.seterr(over='ignore') #ignore overflow error 
 
@@ -72,6 +73,7 @@ class Structure(object):
         self.alpha = 1/self.Eg
         self.epsrel = 0.01
         self.Ef = self.fermi()
+        self.M = self.preconditioner(self.z)
                 
     def gen_mesh(self):
         return np.linspace(0, self.length, self.n)
@@ -143,6 +145,7 @@ class Structure(object):
         return newton(self.charge, 0, maxiter=200)
     
     def poisson(self, V):
+        self.count += 1
         n = zeros_like(V)
         p = zeros_like(V)
         Nd  = zeros_like(V)
@@ -156,15 +159,30 @@ class Structure(object):
             
         return d2V - q0*(Nd - n + p)*self.h
     
+    def preconditioner(self, x):
+        """Compute the preconditioner M"""
+        h = x[1:] - x[:-1]
+        n = len(h)-1
+        diags = zeros((3, n))
+        diags[0] = 2/(h[:-1]*(h[:-1]+h[1:]))
+        diags[1] = -(2/h[:-1]+2/h[1:])/(h[:-1]+h[1:])
+        diags[2] = 2/(h[1:]*(h[:-1]+h[1:]))
+        J = spdiags(diags, [-1,0,1], n, n)
+        J_ilu = spilu(J)
+        M = LinearOperator(shape=(n,n), matvec=J_ilu.solve)
+        return M
+        
     def initGuess(self):
         """ initial guess"""
         self.guess = zeros(len(self.z)-2)
     
     def solve(self):
         """ solve a Poisson equation"""
+        self.count = 0
         self.sol = newton_krylov(self.poisson, self.guess, 
                                  method='lgmres', verbose=1,
-                                 f_tol=2e-5, maxiter=20)
+                                 x_tol=1e-6, maxiter=20,
+                                 inner_M=self.M)
         # set initial guess for next iteration in C-V
         self.guess = self.sol
         #add boundaries
