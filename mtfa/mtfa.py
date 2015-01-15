@@ -7,7 +7,7 @@ from scipy.optimize import newton_krylov, newton
 from scipy.sparse import spdiags
 from scipy.sparse.linalg import spilu, LinearOperator
 import matplotlib.pyplot as plt
-np.seterr(over='ignore') #ignore overflow error 
+np.seterr(over='ignore')  # ignore overflow error
 
 from database import Material, materialproperty, kb, hb, q0, m0, eps0
 

@@ -105,7 +105,7 @@ materialproperty = {
 'eps':11.7, 
 'impurity':{ 
     'P':{
-        'Ei':0.1, #0.045
+        'Ei':0.045,
         'g':2, 
         'type':'donor'
         },
