@@ -72,6 +72,8 @@ class Structure(object):
         self.alpha = 1/self.Eg
         self.epsrel = 0.01
         self.Ef = self.fermi()
+        self.x_tol=1e-6
+        self.f_tol=None
     
     def __setattr__(self, name, value):
         """ overwrite attribute assignment"""
@@ -189,8 +191,8 @@ class Structure(object):
         self.count = 0
         self.sol = newton_krylov(self.poisson, self.guess, 
                                  method='lgmres', verbose=1,
-                                 x_tol=1e-6, maxiter=20,
-                                 inner_M=self.M)
+                                 x_tol=self.x_tol, maxiter=20,
+                                 f_tol=self.f_tol, inner_M=self.M)
         # set initial guess for next iteration in C-V
         self.guess = self.sol
         #add boundaries
