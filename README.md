@@ -28,4 +28,4 @@ Properties of semiconductor materials is defined in database.py.
 1. [Inversion and accumulation layers at InN surfaces](http://www.sciencedirect.com/science/article/pii/S0022024805014600)
 TD Veal, LFJ Piper, WJ Schaff, CF McConville - Journal of crystal growth, 2006
 2. [A novel self-consistent theory of the electronic structure of inversion layers in InSb MIS structures](http://onlinelibrary.wiley.com/doi/10.1002/pssb.2221340245/abstract)
-J.-P. Zöllner, H. Übensee, G. Paasch, T. Fiedler andG. Gobsch - physica status solidi (b), 1986
+J.-P. Zöllner, H. Übensee, G. Paasch, T. Fiedler and G. Gobsch - physica status solidi (b), 1986
