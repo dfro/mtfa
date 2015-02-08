@@ -51,7 +51,7 @@ class Structure(object):
     nss: surface sheet charge in cm-2
     Q: surface charge in cm-2
     """
-    def __init__(self, mat, V0=0, T=300, Nd=0, Na=0, length=5e-8, n=100):
+    def __init__(self, mat, V0=0.0, T=300.0, Nd=0.0, Na=0.0, length=5e-8, n=100):
         self.material = mat
         self.V0 = V0
         self.T = T
@@ -201,3 +201,17 @@ class Structure(object):
         self.F = (self.sol[0]-self.sol[1])/(self.z[0]-self.z[1])
         self.nss = self.F*self.eps[0]/q0/1e4
         self.Q = self.F*self.eps[0]/1e-2
+
+
+if __name__=="__main__":
+    # define structure
+    InN = Material('InN')
+    s = Structure(InN, Nd=1.9e19)
+
+    s.V0 = -0.735  # set surface potential
+
+    # solve Poisson equation
+    s.initGuess()
+    s.solve()
+
+    plt.plot(s.z, s.sol)  # plot solution

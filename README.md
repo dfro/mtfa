@@ -10,13 +10,13 @@ import mtfa
 InN = Material('InN')
 s = Structure(InN, Nd=1.9e19)
 
-s.V0 = -0.735 #set surface potential
+s.V0 = -0.735  # set surface potential
 
 # solve Poisson equation
 s.initGuess()
 s.solve()
 
-plt.plot(s.z, s.sol) #plot solution
+plt.plot(s.z, s.sol)  # plot solution
 ```
 
 ## Material properties
