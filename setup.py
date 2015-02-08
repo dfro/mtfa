@@ -5,6 +5,7 @@ setup(name='mtfa',
       description='Poisson solver with MTFA',
       author='Dmitry Folov',
       license='MIT',
-      packages=['mtfa']
+      packages=['mtfa'],
+      install_requires=['numpy', 'matplotlib', 'scipy']
       )
       
