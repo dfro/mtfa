@@ -2,7 +2,7 @@
 # Ref. http://www.ioffe.ru/SVA/NSM/Semicond 
 # for material properties
 
-#Defining constants
+# Defining constants
 kb = 8.61735E-5     # Boltzmann constant in eV/K
 hb = 6.58212E-16    # Plank's constant(h) in eV*s
 q0 = 1.60218E-19    # electron charge (C)
@@ -64,30 +64,30 @@ class Material(object):
 
 materialproperty = {
 'InAs':{
-'Eg':0.354, # (eV) at 300K
-'Eg0':0.415, # (eV) band gap at 0K
-'Eg_alpha':2.76e-4, # (eV/K) parameter  for Eg temperature dependence
-'Eg_betta':83, # (K) parameter  for Eg temperature dependence
-'m_e':0.023, #conduction band effective mass (relative to electron mass)
-'Mc':1, #number of equivalent valleys in conduction band
-'m_hh':0.41, #heavy hole band effective mass 
-'m_lh':0.026, #light hole band effective mass
-'eps':15.15, #dielectric constant
-'impurity':{ #impurity properties
+'Eg':0.354,  # (eV) at 300K
+'Eg0':0.415,  # (eV) band gap at 0K
+'Eg_alpha':2.76e-4,  # (eV/K) parameter  for Eg temperature dependence
+'Eg_betta':83,  # (K) parameter  for Eg temperature dependence
+'m_e':0.023,  # conduction band effective mass (relative to electron mass)
+'Mc':1,  # number of equivalent valleys in conduction band
+'m_hh':0.41,  # heavy hole band effective mass
+'m_lh':0.026,  # light hole band effective mass
+'eps':15.15,  # dielectric constant
+'impurity':{  # impurity properties
     'S':{
-        'Ei':0.001, # (eV) ionization energies
-        'g':2, # degeneracy factor
+        'Ei':0.001,  # (eV) ionization energies
+        'g':2,  # degeneracy factor
         'type':'donor'
         },
     },
 },
 
 'InN':{
-'Eg':0.503, #0.642
-'Eg0':None, #
+'Eg':0.503,  # 0.642
+'Eg0':None,
 'Eg_alpha':2.5e-4, 
 'Eg_betta':624, 
-'m_e':0.045, #0.11 
+'m_e':0.045,  # 0.11
 'm_hh':1.63, 
 'm_lh':0.27,
 'eps':15.3, 
