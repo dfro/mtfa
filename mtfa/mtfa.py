@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 from math import pi, sqrt
-from numpy import sinc, exp, inf, zeros_like, zeros, ones_like
+from numpy import sinc, inf, zeros_like, zeros, ones_like
 import numpy as np
-from scipy.integrate import quad, quadrature
+from scipy.integrate import quad
 from scipy.optimize import newton_krylov, newton
 from scipy.sparse import spdiags
 from scipy.sparse.linalg import spilu, LinearOperator
 import matplotlib.pyplot as plt
 np.seterr(over='ignore')  # ignore overflow error
 
-from database import Material, materialproperty, kb, hb, q0, m0, eps0
+from database import Material, kb, hb, q0, m0, eps0
+
 
 def diff2(f, a, x, left, right=0):
     """discrete form of second order derivative d(a*df) 
@@ -19,10 +20,9 @@ def diff2(f, a, x, left, right=0):
     f = np.insert(f, 0, left)
     f = np.append(f, right)
 
-    
     d2f = (a[:-2]+a[1:-1])/(h[:-1]*(h[:-1]+h[1:]))*f[:-2] -\
           f[1:-1]/(h[:-1]+h[1:])*\
-          ((a[:-2]+a[1:-1])/h[:-1]+(a[2:]+a[1:-1])/h[1:])+\
+          ((a[:-2]+a[1:-1])/h[:-1]+(a[2:]+a[1:-1])/h[1:]) +\
           (a[2:]+a[1:-1])/(h[1:]*(h[:-1]+h[1:]))*f[2:]
     
     return d2f
@@ -30,7 +30,8 @@ def diff2(f, a, x, left, right=0):
 
 class Material(Material):
     pass
-        
+
+
 class Structure(object):
     """Class for structure properties.
     
@@ -68,16 +69,15 @@ class Structure(object):
         self.m_n = mat.m_n
         self.m_p = mat.m_p
         # nonparabolicity factor        
-#        self.alpha = (1-self.m_n/m0)**2/self.Eg
-        self.alpha = 1/self.Eg
+        self.alpha = (1-self.m_n/m0)**2/self.Eg
         self.epsrel = 0.01
         self.Ef = self.fermi()
-        self.x_tol=1e-6
-        self.f_tol=None
+        self.x_tol = 1e-6
+        self.f_tol = None
     
     def __setattr__(self, name, value):
         """ overwrite attribute assignment"""
-        object.__setattr__(self,name, value)
+        object.__setattr__(self, name, value)
         if name is 'z':
             new_eps = self.gen_array(self.material.eps)*eps0
             object.__setattr__(self, 'n', len(self.z))
@@ -95,21 +95,21 @@ class Structure(object):
         """ density of states in conduction band"""
         C = (2*self.m_n/hb**2)**(3./2)/(2*pi**2)
         E = E - Ec
-        return C*sqrt(E)*sqrt(1+self.alpha*E)*(1+2*self.alpha*E)
+        return C*sqrt(E)*sqrt(1 + self.alpha*E)*(1 + 2*self.alpha*E)
             
     def mcdos(self, E, Ec, z):
         """ Modified density of states in conduction band"""
         if self.Ef < 0:
             L = hb/sqrt(2*self.m_n*kb*self.T)
         else:
-            L = hb/sqrt(2*self.m_n*self.Ef) # Fermi length
+            L = hb/sqrt(2*self.m_n*self.Ef)  # Fermi length
         # correction factor
-        f = 1 - sinc((2*z/L)*sqrt((E-Ec)/kb/self.T)*sqrt(1+self.alpha*(E-Ec))/pi)
+        f = 1 - sinc((2.*z/L)*sqrt((E-Ec)/kb/self.T)*sqrt(1+self.alpha*(E-Ec))/pi)
         return self.cdos(E, Ec)*f
     
     def fd(self, E, Ef):
         """ Fermi-Dirac function"""
-        return 1/(1+exp((E-Ef)/kb/self.T))
+        return 1/(1+np.exp((E-Ef)/kb/self.T))
     
     def cdos_fd(self, E, Ec, Ef):
         """multiply of two function for integral calculation"""
@@ -195,10 +195,9 @@ class Structure(object):
                                  f_tol=self.f_tol, inner_M=self.M)
         # set initial guess for next iteration in C-V
         self.guess = self.sol
-        #add boundaries
+        # add boundaries
         self.sol = np.insert(self.sol, 0, self.V0)
         self.sol = np.append(self.sol, 0)
         self.F = (self.sol[0]-self.sol[1])/(self.z[0]-self.z[1])
         self.nss = self.F*self.eps[0]/q0/1e4
         self.Q = self.F*self.eps[0]/1e-2
-        
