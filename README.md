@@ -4,7 +4,7 @@ MTFA is Python module for solving Poisson equation with Modified Tomas-Fermi app
 
 ## How to use it
 ```python
-import mtfa
+from mtfa import Material, Structure
 
 # define structure
 InN = Material('InN')

@@ -1,1 +1,1 @@
-from mtfa import *
+from mtfa import Material, Structure
