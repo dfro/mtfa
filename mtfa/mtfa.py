@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from math import pi, sqrt
-from numpy import sinc, inf, zeros_like, zeros, ones_like
+from numpy import sinc, inf, zeros_like, zeros, ones_like, ones
 import numpy as np
 from scipy.integrate import quad
 from scipy.optimize import newton_krylov, newton
@@ -38,7 +38,7 @@ class Structure(object):
     attributes:
     V0: surface potential
     T: temperate
-    Nd: donor concentration in cm-3
+    Nd, nd_arr: donor concentration in cm-3
     Na: acceptor concentration in cm-3
     length: length of structure
     n: number of points
@@ -55,12 +55,13 @@ class Structure(object):
         self.material = mat
         self.V0 = V0
         self.T = T
-        self.Nd = Nd*1e6
-        self.Na = Na*1e6
         self.length = length
         self.n = n
         self.h = length/(n+1)
+        self.Nd = Nd*1e6
+        self.Na = Na*1e6
         self.z = self.gen_mesh()
+        self.eps = self.gen_array(self.material.eps)*eps0
         self.Eg = mat.Eg(self.T)
         self.all_ionized = mat.all_ionized
         if not self.all_ionized:
@@ -68,8 +69,7 @@ class Structure(object):
             self.g = mat.g
         self.m_n = mat.m_n
         self.m_p = mat.m_p
-        # nonparabolicity factor        
-        self.alpha = (1-self.m_n/m0)**2/self.Eg
+        self.alpha = (1-self.m_n/m0)**2/self.Eg  # nonparabolicity factor
         self.epsrel = 0.01
         self.Ef = self.fermi()
         self.x_tol = 1e-6
@@ -80,11 +80,13 @@ class Structure(object):
         object.__setattr__(self, name, value)
         if name is 'z':
             new_eps = self.gen_array(self.material.eps)*eps0
+            new_Nd = self.Nd*ones(len(self.z)-2)
             object.__setattr__(self, 'n', len(self.z))
             object.__setattr__(self, 'length', max(self.z))
             object.__setattr__(self, 'M', self.preconditioner(self.z))
-            object.__setattr__(self, 'eps', new_eps)  
-    
+            object.__setattr__(self, 'eps', new_eps)
+            object.__setattr__(self, 'nd_arr', new_Nd)
+
     def gen_mesh(self):
         return np.linspace(0, self.length, self.n)
     
@@ -142,13 +144,13 @@ class Structure(object):
     def ionized(self, Ec, Ef):
         """densities of ionized shallow donors and acceptors"""
         if not self.all_ionized:
-            return self.Nd/(1+self.g*np.exp((Ef-Ec+self.Ei)/kb/self.T))
+            return 1/(1+self.g*np.exp((Ef-Ec+self.Ei)/kb/self.T))
         else:
-            return self.Nd
+            return 1
             
     def charge(self, Ef):
         """equation for charge neutrality calculation"""
-        return self.ionized(0, Ef)-self.ced(0, Ef)+self.vhd(-self.Eg, Ef)
+        return self.Nd*self.ionized(0, Ef)-self.ced(0, Ef)+self.vhd(-self.Eg, Ef)
     
     def fermi(self):
         """find fermi level using nonlinear solver"""
@@ -164,7 +166,7 @@ class Structure(object):
         for i, z in enumerate(self.z[1:-1]):
             n[i] = self.mced(V[i], z, self.Ef)
             p[i] = self.vhd(V[i]-self.Eg, self.Ef)
-            Nd[i] = self.ionized(V[i], self.Ef)
+            Nd[i] = self.nd_arr[i]*self.ionized(V[i], self.Ef)
             
             
         return d2V - q0*(Nd - n + p)*self.h
@@ -203,7 +205,7 @@ class Structure(object):
         self.Q = self.F*self.eps[0]/1e-2
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     # define structure
     InN = Material('InN')
     s = Structure(InN, Nd=1.9e19)
