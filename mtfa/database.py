@@ -63,69 +63,68 @@ class Material(object):
             return self.Eg0 - self.Eg_alpha*T**2/(T + self.Eg_betta)
 
 materialproperty = {
-'InAs':{
-'Eg':0.354,  # (eV) at 300K
-'Eg0':0.415,  # (eV) band gap at 0K
-'Eg_alpha':2.76e-4,  # (eV/K) parameter  for Eg temperature dependence
-'Eg_betta':83,  # (K) parameter  for Eg temperature dependence
-'m_e':0.023,  # conduction band effective mass (relative to electron mass)
-'Mc':1,  # number of equivalent valleys in conduction band
-'m_hh':0.41,  # heavy hole band effective mass
-'m_lh':0.026,  # light hole band effective mass
-'eps':15.15,  # dielectric constant
-'impurity':{  # impurity properties
-    'S':{
-        'Ei':0.001,  # (eV) ionization energies
-        'g':2,  # degeneracy factor
-        'type':'donor'
+    'InAs': {
+        'Eg': 0.354,  # (eV) at 300K
+        'Eg0': 0.415,  # (eV) band gap at 0K
+        'Eg_alpha': 2.76e-4,  # (eV/K) parameter  for Eg temperature dependence
+        'Eg_betta': 83,  # (K) parameter  for Eg temperature dependence
+        'm_e': 0.023,  # conduction band effective mass (relative to electron mass)
+        'Mc': 1,  # number of equivalent valleys in conduction band
+        'm_hh': 0.41,  # heavy hole band effective mass
+        'm_lh': 0.026,  # light hole band effective mass
+        'eps': 15.15,  # dielectric constant
+        'impurity': {  # impurity properties
+            'S': {
+                'Ei': 0.0045,  # (eV) ionization energies
+                'g': 2,  # degeneracy factor
+                'type': 'donor'
+                },
         },
     },
-},
 
-'InN':{
-'Eg':0.503,  # 0.642
-'Eg0':None,
-'Eg_alpha':2.5e-4, 
-'Eg_betta':624, 
-'m_e':0.045,  # 0.11
-'m_hh':1.63, 
-'m_lh':0.27,
-'eps':15.3, 
-},
-
-'Si':{
-'Eg':1.12, 
-'Eg0':1.17,
-'Eg_alpha':4.73e-4, 
-'Eg_betta':636, 
-'m_e':0.32,
-'Mc':6,
-'m_hh':0.49, 
-'m_lh':0.16,
-'eps':11.7, 
-'impurity':{ 
-    'P':{
-        'Ei':0.045,
-        'g':2, 
-        'type':'donor'
-        },
-    'B':{
-        'Ei':0.045, 
-        'g':4, 
-        'type':'acceptor'
-        },
+    'InN': {
+        'Eg':   0.503,  # 0.642
+        'Eg0':  None,
+        'Eg_alpha': 2.5e-4,
+        'Eg_betta': 624,
+        'm_e':  0.045,  # 0.11
+        'm_hh': 1.63,
+        'm_lh': 0.27,
+        'eps':  15.3,
     },
-},
 
-'SnO2':{
-'Eg':3.6, 
-'Eg0':None,
-'Eg_alpha':None, 
-'Eg_betta':None, 
-'m_e':0.27,
-'m_hh':0, 
-'m_lh':0,
-'eps':12.2, 
-},
+    'Si': {
+        'Eg': 1.12,
+        'Eg0': 1.17,
+        'Eg_alpha': 4.73e-4,
+        'Eg_betta': 636,
+        'm_e': 0.32,
+        'Mc': 6,
+        'm_hh': 0.49,
+        'm_lh': 0.16,
+        'eps': 11.7,
+        'impurity': {
+            'P': {
+                'Ei': 0.045,
+                'g': 2,
+                'type': 'donor'
+                },
+            'B': {
+                'Ei': 0.045,
+                'g': 4,
+                'type': 'acceptor'
+                },
+            },
+    },
 
+    'SnO2': {
+        'Eg': 3.6,
+        'Eg0': None,
+        'Eg_alpha': None,
+        'Eg_betta': None,
+        'm_e': 0.27,
+        'm_hh': 0,
+        'm_lh': 0,
+        'eps': 12.2,
+    },
 }
